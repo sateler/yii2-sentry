@@ -6,6 +6,7 @@
 
 namespace notamedia\sentry;
 
+use Yii;
 use yii\helpers\ArrayHelper;
 use yii\log\Logger;
 use yii\log\Target;
@@ -37,6 +38,18 @@ class SentryTarget extends Target
      * @var \Raven_Client
      */
     protected $client;
+    /**
+     * @var string User's id field in identity to build Sentry User Data (id).
+     */
+    public $userIdAttribute = null;
+    /**
+     * @var string User's username field in identity to build Sentry User Data (username).
+     */
+    public $userUsernameAttribute = null;
+    /**
+     * @var string User's email field in identity to build Sentry User Data (email).
+     */
+    public $userEmailAttribute = null;
 
     /**
      * @inheritdoc
@@ -97,6 +110,18 @@ class SentryTarget extends Target
 
             if (is_callable($this->extraCallback) && isset($data['extra'])) {
                 $data['extra'] = call_user_func($this->extraCallback, $text, $data['extra']);
+            }
+
+            if(!Yii::$app->user->isGuest) {
+                if($this->userIdAttribute) {
+                    $data['user']['id'] = ArrayHelper::getValue(Yii::$app->user->identity, $this->userIdAttribute);
+                }
+                if($this->userUsernameAttribute) {
+                    $data['user']['username'] = ArrayHelper::getValue(Yii::$app->user->identity, $this->userUsernameAttribute);
+                }
+                if($this->userEmailAttribute) {
+                    $data['user']['email'] = ArrayHelper::getValue(Yii::$app->user->identity, $this->userEmailAttribute);
+                }
             }
             
             $this->client->capture($data, $traces);

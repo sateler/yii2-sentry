@@ -48,6 +48,25 @@ Writing messages with extra data:
 ], 'category');
 ```
 
+### User Data
+
+To add the user info to Sentry's context data, provide the attribute names of the Identity Class (User Model) properties that contain such data. Id, Username and Email can be provided. See https://docs.sentry.io/learn/context/#capturing-the-user and http://www.yiiframework.com/doc-2.0/guide-security-authentication.html#configuring-user for more details.
+ 
+```php
+    'targets' => [
+        [
+            'class' => 'notamedia\sentry\SentryTarget',
+            'dsn' => 'http://2682ybvhbs347:235vvgy465346@sentry.io/1',
+            'levels' => ['error', 'warning'],
+            'context' => true, // Write the context information. The default is true.
+            // User info:
+            'userIdAttribute' => 'id',
+            'userUsernameAttribute' => 'username',
+            'userEmailAttribute' => 'email',
+        ],
+    ],
+```
+
 ### Extra callback
 
 `extraCallback` property can modify extra's data as callable function:
